@@ -405,3 +405,25 @@ export async function getUserById(token: string, id: number) {
 
   return result;
 }
+
+export async function deleteRoomImage(
+  token: string,
+  roomId: number,
+  imageId: number,
+) {
+  const response = await fetch(`${API_URL}/rooms/${roomId}/images/${imageId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Impossible de supprimer la photo.");
+  }
+
+  return result;
+}

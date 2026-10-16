@@ -24,7 +24,6 @@ type Reservation = {
     capacity: number;
     location: string;
     equipment: string;
-    imageUrl?: string | null;
     images?: {
       id: number;
       url: string;
@@ -106,6 +105,11 @@ export default function AdminReservationDetailsPage() {
   };
 
   const status = getStatus();
+
+  const roomImages =
+    reservation?.room.images?.filter(
+      (image) => typeof image.url === "string" && image.url.trim() !== "",
+    ) ?? [];
 
   if (isLoading) {
     return (
@@ -255,45 +259,39 @@ export default function AdminReservationDetailsPage() {
                 </p>
               </div>
 
-              {reservation.room.images &&
-                reservation.room.images.length > 0 && (
-                  <div className="pt-2">
-                    <p className="text-sm text-gray-500">Photos</p>
+              {roomImages.length > 0 && (
+                <div className="pt-2">
+                  <p className="text-sm text-gray-500">Photos</p>
 
-                    <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-                      {reservation.room.images
-                        .slice(0, 3)
-                        .map((image, index) => (
-                          <button
-                            key={image.id}
-                            type="button"
-                            onClick={() => setSelectedImageIndex(index)}
-                            className="group relative h-40 overflow-hidden rounded-lg bg-[#FAF9F6]"
-                          >
-                            <Image
-                              src={image.url}
-                              alt={`${reservation.room.name} - photo ${
-                                index + 1
-                              }`}
-                              width={400}
-                              height={300}
-                              className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
-                            />
+                  <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    {roomImages.slice(0, 3).map((image, index) => (
+                      <button
+                        key={image.id}
+                        type="button"
+                        onClick={() => setSelectedImageIndex(index)}
+                        className="group relative h-40 overflow-hidden rounded-lg bg-[#FAF9F6]"
+                      >
+                        <Image
+                          src={image.url}
+                          alt={`${reservation.room.name} - photo ${index + 1}`}
+                          width={400}
+                          height={300}
+                          className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
+                        />
 
-                            {index === 2 &&
-                              reservation.room.images!.length > 3 && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                  <span className="text-lg font-semibold text-white">
-                                    +{reservation.room.images!.length - 3}{" "}
-                                    photos
-                                  </span>
-                                </div>
-                              )}
-                          </button>
-                        ))}
-                    </div>
+                        {index === 2 && roomImages.length > 3 && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                            <span className="text-lg font-semibold text-white">
+                              +{roomImages.length - 3} photo
+                              {roomImages.length - 3 > 1 ? "s" : ""}
+                            </span>
+                          </div>
+                        )}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -304,71 +302,72 @@ export default function AdminReservationDetailsPage() {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
             onClick={() => setSelectedImageIndex(null)}
           >
-            <button
-              type="button"
-              onClick={() => setSelectedImageIndex(null)}
-              className="absolute right-6 top-6 text-3xl text-white transition hover:opacity-70"
-              aria-label="Fermer"
-            >
-              ×
-            </button>
+            {(() => {
+              if (!roomImages[selectedImageIndex]) return null;
 
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
+              return (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedImageIndex(null)}
+                    className="absolute right-6 top-6 text-3xl text-white transition hover:opacity-70"
+                    aria-label="Fermer"
+                  >
+                    ×
+                  </button>
 
-                setSelectedImageIndex((current) =>
-                  current !== null
-                    ? current === 0
-                      ? reservation.room.images!.length - 1
-                      : current - 1
-                    : null,
-                );
-              }}
-              className="absolute left-6 text-4xl text-white transition hover:opacity-70"
-              aria-label="Photo précédente"
-            >
-              ‹
-            </button>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSelectedImageIndex((current) =>
+                        current !== null
+                          ? (current - 1 + roomImages.length) %
+                            roomImages.length
+                          : null,
+                      );
+                    }}
+                    className="absolute left-6 text-4xl text-white transition hover:opacity-70"
+                    aria-label="Photo précédente"
+                  >
+                    ‹
+                  </button>
 
-            <div
-              className="max-h-[85vh] max-w-5xl"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <Image
-                src={reservation.room.images[selectedImageIndex].url}
-                alt={`${reservation.room.name} - photo ${
-                  selectedImageIndex + 1
-                }`}
-                width={1200}
-                height={800}
-                className="max-h-[85vh] max-w-full rounded-lg object-contain"
-              />
+                  <div
+                    className="max-h-[85vh] max-w-5xl"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <Image
+                      src={roomImages[selectedImageIndex].url}
+                      alt={`${reservation.room.name} - photo ${selectedImageIndex + 1}`}
+                      width={1200}
+                      height={800}
+                      className="max-h-[85vh] max-w-full rounded-lg object-contain"
+                    />
 
-              <p className="mt-3 text-center text-sm text-white">
-                {selectedImageIndex + 1} / {reservation.room.images.length}
-              </p>
-            </div>
+                    <p className="mt-3 text-center text-sm text-white">
+                      {selectedImageIndex + 1} / {roomImages.length}
+                    </p>
+                  </div>
 
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-
-                setSelectedImageIndex((current) =>
-                  current !== null
-                    ? current === reservation.room.images!.length - 1
-                      ? 0
-                      : current + 1
-                    : null,
-                );
-              }}
-              className="absolute right-6 text-4xl text-white transition hover:opacity-70"
-              aria-label="Photo suivante"
-            >
-              ›
-            </button>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSelectedImageIndex((current) =>
+                        current !== null
+                          ? (current + 1) % roomImages.length
+                          : null,
+                      );
+                    }}
+                    className="absolute right-6 text-4xl text-white transition hover:opacity-70"
+                    aria-label="Photo suivante"
+                  >
+                    ›
+                  </button>
+                </>
+              );
+            })()}
           </div>
         )}
       </div>

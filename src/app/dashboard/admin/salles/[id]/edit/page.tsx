@@ -5,7 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
-import { getRoomById, updateRoom } from "@/src/services/reservations.service";
+import {
+  getRoomById,
+  updateRoom,
+  deleteRoomImage,
+} from "@/src/services/reservations.service";
 
 type Room = {
   id: number;
@@ -29,9 +33,12 @@ export default function EditRoomPage() {
   const [location, setLocation] = useState("");
   const [equipment, setEquipment] = useState("");
 
-  const [currentImages, setCurrentImages] = useState<string[]>([]);
+  const [currentImages, setCurrentImages] = useState<
+    { id: number; url: string }[]
+  >([]);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,12 +62,15 @@ export default function EditRoomPage() {
         setLocation(room.location);
         setEquipment(room.equipment || "");
 
-        const existingImages = room.images?.map((image) => image.url) || [];
-
-        if (existingImages.length > 0) {
-          setCurrentImages(existingImages);
-        } else if (room.imageUrl) {
-          setCurrentImages([room.imageUrl]);
+        if (room.images && room.images.length > 0) {
+          setCurrentImages(
+            room.images.filter(
+              (image) =>
+                image.id != null &&
+                typeof image.url === "string" &&
+                image.url.trim() !== "",
+            ),
+          );
         } else {
           setCurrentImages([]);
         }
@@ -104,6 +114,41 @@ export default function EditRoomPage() {
     ]);
 
     event.target.value = "";
+  };
+
+  const handleDeleteCurrentImage = async (imageId: number) => {
+    const confirmed = window.confirm(
+      "Voulez-vous vraiment supprimer cette photo ? Cette action est définitive.",
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+    setDeletingImageId(imageId);
+
+    try {
+      const token = localStorage.getItem("access_token");
+
+      if (!token) {
+        throw new Error("Vous devez être connecté pour supprimer une photo.");
+      }
+
+      await deleteRoomImage(token, Number(params.id), imageId);
+
+      setCurrentImages((previousImages) =>
+        previousImages.filter((image) => image.id !== imageId),
+      );
+    } catch (error) {
+      console.error("Erreur suppression photo :", error);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Impossible de supprimer la photo.",
+      );
+    } finally {
+      setDeletingImageId(null);
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -272,19 +317,28 @@ export default function EditRoomPage() {
                 </p>
 
                 <div className="grid grid-cols-2 gap-3">
-                  {currentImages.map((imageUrl, index) => (
+                  {currentImages.map((image, index) => (
                     <div
-                      key={imageUrl}
+                      key={image.id}
                       className="relative h-36 overflow-hidden rounded-md border border-[#E8E5DE] bg-[#FAF9F6] sm:h-40"
                     >
                       <Image
-                        src={imageUrl}
+                        src={image.url}
                         alt={`Photo actuelle ${index + 1}`}
                         fill
                         sizes="(max-width: 640px) 50vw, 320px"
                         className="object-cover"
-                        loading="eager"
                       />
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCurrentImage(image.id)}
+                        disabled={deletingImageId !== null || isSaving}
+                        aria-label={`Supprimer la photo ${index + 1}`}
+                        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#4F654F] text-lg font-semibold text-white shadow transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {deletingImageId === image.id ? "…" : "×"}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -299,40 +353,42 @@ export default function EditRoomPage() {
                 </p>
 
                 <div className="grid grid-cols-2 gap-3">
-                  {imagePreviews.map((preview, index) => (
-                    <div
-                      key={preview}
-                      className="relative h-36 overflow-hidden rounded-md border border-[#E8E5DE] bg-[#FAF9F6] sm:h-40"
-                    >
-                      <Image
-                        src={preview}
-                        alt={`Nouvelle photo ${index + 1}`}
-                        fill
-                        sizes="(max-width: 640px) 50vw, 320px"
-                        className="object-cover"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setImages((previousImages) =>
-                            previousImages.filter(
-                              (_, imageIndex) => imageIndex !== index,
-                            ),
-                          );
-
-                          setImagePreviews((previousPreviews) =>
-                            previousPreviews.filter(
-                              (_, previewIndex) => previewIndex !== index,
-                            ),
-                          );
-                        }}
-                        className="absolute right-2 top-2 rounded-full bg-[#4F654F] px-2 py-1 text-xs font-semibold text-white transition hover:bg-[#5F765F]"
+                  {imagePreviews.map((preview, index) =>
+                    preview ? (
+                      <div
+                        key={preview}
+                        className="relative h-36 overflow-hidden rounded-md border border-[#E8E5DE] bg-[#FAF9F6] sm:h-40"
                       >
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                        <Image
+                          src={preview}
+                          alt={`Nouvelle photo ${index + 1}`}
+                          fill
+                          sizes="(max-width: 640px) 50vw, 320px"
+                          className="object-cover"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImages((previousImages) =>
+                              previousImages.filter(
+                                (_, imageIndex) => imageIndex !== index,
+                              ),
+                            );
+
+                            setImagePreviews((previousPreviews) =>
+                              previousPreviews.filter(
+                                (_, previewIndex) => previewIndex !== index,
+                              ),
+                            );
+                          }}
+                          className="absolute right-2 top-2 rounded-full bg-[#4F654F] px-2 py-1 text-xs font-semibold text-white transition hover:bg-[#5F765F]"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ) : null,
+                  )}
                 </div>
               </div>
             )}

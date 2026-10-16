@@ -201,7 +201,9 @@ export default function AdminRoomsPage() {
             {/* Grille des salles */}
             <div className="mt-8 grid gap-6 md:grid-cols-2">
               {displayedRooms.map((room) => {
-                const firstImage = room.images?.[0]?.url || room.imageUrl;
+                const firstImage = room.images?.find((image) =>
+                  image.url?.trim(),
+                )?.url;
 
                 return (
                   <div

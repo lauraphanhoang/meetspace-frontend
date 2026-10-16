@@ -16,6 +16,9 @@ type User = {
   role: "USER" | "ADMIN";
   avatarUrl?: string | null;
   createdAt: string;
+  _count: {
+    reservations: number;
+  };
 };
 
 export default function AdminUsersPage() {
@@ -106,6 +109,10 @@ export default function AdminUsersPage() {
 
                       <th className="px-6 py-4 font-semibold">Rôle</th>
 
+                      <th className="px-6 py-4 text-center font-semibold">
+                        Nombre de réservations
+                      </th>
+
                       <th className="px-6 py-4 font-semibold">Action</th>
                     </tr>
                   </thead>
@@ -164,6 +171,11 @@ export default function AdminUsersPage() {
                           >
                             {user.role}
                           </span>
+                        </td>
+
+                        {/* Nombre de réservations */}
+                        <td className="px-6 py-4 text-center text-gray-700">
+                          {user._count.reservations}
                         </td>
 
                         {/* Action */}

@@ -300,13 +300,14 @@ export default function AdminReservationsPage() {
                             <td className="px-6 py-4 font-medium">
                               <div className="flex items-center gap-3">
                                 <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-[#FAF9F6]">
-                                  {reservation.room.images?.[0]?.url ||
-                                  reservation.room.imageUrl ? (
+                                  {reservation.room.images?.find((image) =>
+                                    image.url?.trim(),
+                                  )?.url ? (
                                     <Image
                                       src={
-                                        reservation.room.images?.[0]?.url ||
-                                        reservation.room.imageUrl ||
-                                        ""
+                                        reservation.room.images.find((image) =>
+                                          image.url?.trim(),
+                                        )!.url
                                       }
                                       alt={reservation.room.name}
                                       width={48}

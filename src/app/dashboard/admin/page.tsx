@@ -185,7 +185,7 @@ export default function AdminDashboardPage() {
   };
 
   const getRoomImage = (room: Reservation["room"]) => {
-    return room.images?.[0]?.url || room.imageUrl || null;
+    return room.images?.find((image) => image.url?.trim())?.url || null;
   };
 
   if (isLoading) {
