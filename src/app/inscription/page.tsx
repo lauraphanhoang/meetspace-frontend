@@ -4,10 +4,12 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import AuthLayout from "@/src/components/auth/AuthLayout";
 import { registerUser } from "@/src/services/auth.service";
+import { useRouter } from "next/navigation";
 
 import { Eye, EyeOff } from "lucide-react";
 
 export default function InscriptionPage() {
+  const router = useRouter();
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
@@ -33,12 +35,7 @@ export default function InscriptionPage() {
         password,
       });
 
-      setSuccess("Votre compte a été créé avec succès.");
-
-      setFirstname("");
-      setLastname("");
-      setEmail("");
-      setPassword("");
+      router.push("/connexion");
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Une erreur est survenue.",
