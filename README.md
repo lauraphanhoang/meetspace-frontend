@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# MeetSpace — Frontend
 
-First, run the development server:
+MeetSpace est une application web de réservation de salles, développée dans le cadre de mon projet de certification RNCP 41133 — Concepteur Développeur d'Applications.
+
+Ce dépôt contient le frontend de l'application, développé avec Next.js, React, TypeScript et Tailwind CSS.
+
+Site déployé : https://meetspace-frontend-tan.vercel.app
+
+
+## Technologies utilisées
+
+- **Next.js 16.2.12** — Framework React avec App Router
+- **React 19.2.4** — Développement des interfaces
+- **TypeScript 5** — Typage du code
+- **Tailwind CSS 4** — Mise en forme et responsive design
+- **Lucide React** — Icônes de l'interface
+- **ESLint 9** — Analyse statique du code
+- **Vercel** — Hébergement du frontend
+
+
+## Fonctionnalités
+
+### Authentification
+- Inscription et connexion
+- Déconnexion
+- Redirection selon le rôle (USER ou ADMIN)
+- Consultation et modification du profil
+- Modification du mot de passe
+- Gestion de l'avatar
+
+### Espace utilisateur
+- Tableau de bord personnel
+- Consultation des salles disponibles
+- Affichage des détails et des images des salles
+- Création de réservations
+- Vérification des disponibilités
+- Modification et suppression de ses réservations
+- Historique des réservations avec pagination
+
+### Espace administrateur
+- Tableau de bord avec statistiques
+- Gestion des salles (création, modification, suppression)
+- Gestion des images des salles
+- Consultation des utilisateurs
+- Consultation des réservations
+- Recherche et pagination
+
+L'administrateur dispose d'un accès en lecture seule aux réservations des utilisateurs.
+
+## Architecture du projet
+
+Le frontend utilise l'App Router de Next.js.
+
+L'application comprend :
+- Des pages organisées par routes
+- Des composants réutilisables
+- Des services pour communiquer avec l'API REST
+- Des interfaces adaptées aux ordinateurs et aux mobiles
+- Des Server Components et Client Components selon les besoins
+
+## Installation
+
+### Prérequis
+
+- Node.js
+- npm
+- Backend MeetSpace fonctionnel
+
+### Cloner le dépôt
+
+```bash
+git clone <URL_DU_DEPOT_FRONTEND>
+cd meetspace-frontend
+```
+
+### Installer les dépendances
+
+```bash
+npm install
+```
+
+### Configurer les variables d'environnement
+
+Créer un fichier `.env.local` à la racine du projet :
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+Cette variable définit l'adresse de l'API backend.
+
+### Lancer le projet
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Créer une version de production
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Lancer la version de production
 
-## Learn More
+```bash
+npm run start
+```
+## Communication avec le backend
 
-To learn more about Next.js, take a look at the following resources:
+Le frontend communique avec l'API NestJS à l'aide de requêtes HTTP.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Après connexion, un JWT est conservé dans le `localStorage` et transmis dans l'en-tête `Authorization` pour les requêtes nécessitant une authentification.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Les autorisations sont vérifiées côté backend.
 
-## Deploy on Vercel
+## Déploiement
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Le frontend est hébergé sur Vercel : https://meetspace-frontend-tan.vercel.app
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le dépôt GitHub est connecté à Vercel afin de permettre le déploiement des nouvelles versions.
+
+La variable `NEXT_PUBLIC_API_URL` est configurée avec l'adresse publique du backend hébergé sur Render.
+
+## Améliorations envisagées
+
+- Synchronisation avec Google Calendar
+- Notifications par e-mail
+- Authentification Google ou Microsoft
+- Amélioration de la gestion des sessions
+- Renforcement de l'accessibilité
+
+## Contexte du projet
+
+Projet personnel réalisé dans le cadre de la préparation au titre RNCP 41133 — Concepteur Développeur d'Applications, niveau 6.
