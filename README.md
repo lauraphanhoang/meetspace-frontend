@@ -1,136 +1,122 @@
 
 # MeetSpace — Frontend
 
-MeetSpace est une application web de réservation de salles, développée dans le cadre de mon projet de certification RNCP 41133 — Concepteur Développeur d'Applications.
+MeetSpace est une application web full-stack de réservation de salles, développée dans le cadre de la préparation au titre **RNCP 41133 — Concepteur Développeur d'Applications (niveau 6)**.
 
-Ce dépôt contient le frontend de l'application, développé avec Next.js, React, TypeScript et Tailwind CSS.
+Ce dépôt contient l'interface utilisateur de l'application, développée avec **Next.js, React et TypeScript**.
 
-Site déployé : https://meetspace-frontend-tan.vercel.app
+L'application permet aux utilisateurs de consulter les salles disponibles, de gérer leurs réservations et d'accéder à leur espace personnel. Une interface d'administration permet également de gérer les salles et de consulter les données de l'application.
 
+## Application en ligne
+
+- **Application MeetSpace :** https://meetspace-frontend-tan.vercel.app
+- **API REST :** https://meetspace-backend-5ybo.onrender.com/api
+
+Le frontend est hébergé sur Vercel et communique avec une API NestJS déployée sur Render.
 
 ## Technologies utilisées
 
-- **Next.js 16.2.12** — Framework React avec App Router
-- **React 19.2.4** — Développement des interfaces
-- **TypeScript 5** — Typage du code
+- **Next.js 16 / React 19** — Framework frontend et interface utilisateur
+- **TypeScript 5** — Typage statique
 - **Tailwind CSS 4** — Mise en forme et responsive design
-- **Lucide React** — Icônes de l'interface
-- **ESLint 9** — Analyse statique du code
+- **Lucide React** — Bibliothèque d'icônes
+- **ESLint** — Analyse statique du code
 - **Vercel** — Hébergement du frontend
 
+## Fonctionnalités principales
 
-## Fonctionnalités
-
-### Authentification
+### Authentification et profil
 - Inscription et connexion
-- Déconnexion
-- Redirection selon le rôle (USER ou ADMIN)
+- Gestion de l'authentification avec JWT
 - Consultation et modification du profil
-- Modification du mot de passe
-- Gestion de l'avatar
+- Modification du mot de passe et de l'avatar
 
 ### Espace utilisateur
-- Tableau de bord personnel
-- Consultation des salles disponibles
-- Affichage des détails et des images des salles
-- Création de réservations
-- Vérification des disponibilités
-- Modification et suppression de ses réservations
-- Historique des réservations avec pagination
+- Consultation des salles et de leurs détails
+- Création, modification et suppression des réservations
+- Vérification des créneaux disponibles
+- Consultation de l'historique des réservations
+- Interface responsive adaptée aux différents écrans
 
 ### Espace administrateur
 - Tableau de bord avec statistiques
-- Gestion des salles (création, modification, suppression)
-- Gestion des images des salles
+- Gestion des salles et de leurs images
 - Consultation des utilisateurs
-- Consultation des réservations
-- Recherche et pagination
+- Consultation et recherche des réservations
+- Pagination des listes
 
-L'administrateur dispose d'un accès en lecture seule aux réservations des utilisateurs.
-
-## Architecture du projet
-
-Le frontend utilise l'App Router de Next.js.
-
-L'application comprend :
-- Des pages organisées par routes
-- Des composants réutilisables
-- Des services pour communiquer avec l'API REST
-- Des interfaces adaptées aux ordinateurs et aux mobiles
-- Des Server Components et Client Components selon les besoins
-
-## Installation
+## Installation en local
 
 ### Prérequis
 
-- Node.js
-- npm
-- Backend MeetSpace fonctionnel
+- Node.js et npm
+- Backend MeetSpace accessible localement ou en ligne
 
-### Cloner le dépôt
+### 1. Cloner le dépôt
 
-```bash
-git clone <URL_DU_DEPOT_FRONTEND>
+```bash id="j1tm3k"
+git clone https://github.com/lauraphanhoang/meetspace-frontend.git
 cd meetspace-frontend
 ```
 
-### Installer les dépendances
+### 2. Installer les dépendances
 
-```bash
+```bash id="0svds7"
 npm install
 ```
 
-### Configurer les variables d'environnement
+### 3. Configurer les variables d'environnement
 
 Créer un fichier `.env.local` à la racine du projet :
 
-```env
+```env id="ggtwka"
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-Cette variable définit l'adresse de l'API backend.
+Cette variable définit l'adresse de l'API utilisée par le frontend.
 
-### Lancer le projet
+### 4. Démarrer l'application
 
-```bash
+```bash id="2y3sd0"
 npm run dev
 ```
 
-### Créer une version de production
+L'application est accessible sur :
 
-```bash
-npm run build
+http://localhost:3000
+
+## Commandes disponibles
+
+```bash id="92rzq1"
+npm run dev    # Démarrage en développement
+npm run build  # Compilation pour la production
+npm run start  # Démarrage de la version compilée
+npm run lint   # Analyse du code avec ESLint
 ```
 
-### Lancer la version de production
-
-```bash
-npm run start
-```
 ## Communication avec le backend
 
-Le frontend communique avec l'API NestJS à l'aide de requêtes HTTP.
+Le frontend communique avec l'API REST NestJS via des requêtes HTTP.
 
-Après connexion, un JWT est conservé dans le `localStorage` et transmis dans l'en-tête `Authorization` pour les requêtes nécessitant une authentification.
+Les appels API sont centralisés dans des fichiers de services, notamment :
+
+- `auth.service.ts` — Authentification et profil
+- `reservations.service.ts` — Salles et réservations
+
+Après connexion, le JWT est stocké dans le `localStorage` et transmis dans l'en-tête `Authorization` des requêtes nécessitant une authentification.
 
 Les autorisations sont vérifiées côté backend.
 
 ## Déploiement
 
-Le frontend est hébergé sur Vercel : https://meetspace-frontend-tan.vercel.app
+- **Frontend :** Vercel
+- **Backend :** Render
+- **Base de données :** Neon (PostgreSQL)
+- **Images :** Cloudinary
 
-Le dépôt GitHub est connecté à Vercel afin de permettre le déploiement des nouvelles versions.
+En production, la variable d'environnement `NEXT_PUBLIC_API_URL` est configurée avec l'adresse du backend déployé :
 
-La variable `NEXT_PUBLIC_API_URL` est configurée avec l'adresse publique du backend hébergé sur Render.
+```env id="kg6oln"
+NEXT_PUBLIC_API_URL=https://meetspace-backend-5ybo.onrender.com
+```
 
-## Améliorations envisagées
-
-- Synchronisation avec Google Calendar
-- Notifications par e-mail
-- Authentification Google ou Microsoft
-- Amélioration de la gestion des sessions
-- Renforcement de l'accessibilité
-
-## Contexte du projet
-
-Projet personnel réalisé dans le cadre de la préparation au titre RNCP 41133 — Concepteur Développeur d'Applications, niveau 6.
